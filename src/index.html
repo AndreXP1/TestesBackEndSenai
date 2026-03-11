@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trunfo Dino - Gerenciador</title>
+    <style>
+        :root {
+            --olive-bark: #585123ff;
+            --honey-bronze: #eec170ff;
+            --sandy-brown: #f2a65aff;
+            --atomic-tangerine: #f58549ff;
+            --brandy: #772f1aff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--olive-bark) 0%, var(--brandy) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background-color: var(--brandy);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        h1 {
+            color: var(--honey-bronze);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        button {
+            background-color: var(--atomic-tangerine);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover {
+            background-color: var(--sandy-brown);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .form-container {
+            background-color: var(--olive-bark);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-container.active {
+            display: block;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--honey-bronze);
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--sandy-brown);
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--atomic-tangerine);
+            transform: scale(1.02);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, var(--honey-bronze) 0%, var(--sandy-brown) 100%);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: var(--brandy);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.5s ease-out both;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .card h3 {
+            color: var(--brandy);
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 2px solid var(--brandy);
+            padding-bottom: 10px;
+            transition: color 0.3s;
+        }
+
+        .card:hover h3 {
+            color: var(--olive-bark);
+        }
+
+        .card-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-item:hover {
+            background: rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--olive-bark);
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--brandy);
+        }
+
+        .card-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, opacity 0.3s;
+            opacity: 0;
+        }
+
+        .card:hover .card-details {
+            max-height: 300px;
+            opacity: 1;
+        }
+
+        .card-info {
+            margin-bottom: 8px;
+            font-size: 13px;
+            padding: 5px;
+            border-left: 3px solid var(--brandy);
+            padding-left: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .card-info:hover {
+            transform: translateX(5px);
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .card-info strong {
+            color: var(--olive-bark);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease-out;
+        }
+
+        .card:hover .card-actions {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-actions button {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .btn-edit {
+            background-color: var(--sandy-brown);
+        }
+
+        .btn-delete {
+            background-color: var(--brandy);
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .message.success {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .message.error {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: var(--honey-bronze);
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Animação dos cards em sequência */
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.15s; }
+        .card:nth-child(3) { animation-delay: 0.2s; }
+        .card:nth-child(4) { animation-delay: 0.25s; }
+        .card:nth-child(5) { animation-delay: 0.3s; }
+        .card:nth-child(6) { animation-delay: 0.35s; }
+        .card:nth-child(7) { animation-delay: 0.4s; }
+        .card:nth-child(8) { animation-delay: 0.45s; }
+        .card:nth-child(n+9) { animation-delay: 0.5s; }
+
+        .hover-hint {
+            text-align: center;
+            font-size: 12px;
+            color: var(--olive-bark);
+            opacity: 0.7;
+            font-style: italic;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🦖 Trunfo Dino - Gerenciador</h1>
+            <p>Gerencie seus dinossauros favoritos</p>
+        </header>
+
+        <div class="controls">
+            <button onclick="loadDinos()">🔄 Carregar Todos</button>
+            <button onclick="showAddForm()">➕ Adicionar</button>
+            <button onclick="showSearchForm()">🔍 Buscar</button>
+        </div>
+
+        <div id="message"></div>
+
+        <!-- Formulário para adicionar/editar -->
+        <div id="formContainer" class="form-container">
+            <h2 id="formTitle">Adicionar Novo Dino</h2>
+            <form id="dinoForm">
+                <input type="hidden" id="dinoId">
+                
+                <div class="form-group">
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="altura">Altura (m):</label>
+                    <input type="number" step="0.01" id="altura" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="comprimento">Comprimento (m):</label>
+                    <input type="number" step="0.01" id="comprimento" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="peso">Peso (kg):</label>
+                    <input type="number" step="0.01" id="peso" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="velocidade">Velocidade:</label>
+                    <input type="number" id="velocidade" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="agilidade">Agilidade:</label>
+                    <input type="number" id="agilidade" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="longevidade">Longevidade (anos):</label>
+                    <input type="number" id="longevidade" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="numeroMagico">Número Mágico:</label>
+                    <input type="number" id="numeroMagico" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="imagem">Imagem URL:</label>
+                    <input type="text" id="imagem" placeholder="URL da imagem">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit">💾 Salvar</button>
+                    <button type="button" onclick="hideForm()">❌ Cancelar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Formulário de busca -->
+        <div id="searchContainer" class="form-container">
+            <h2>Buscar Dino por ID</h2>
+            <div class="form-group">
+                <label for="searchId">ID do Dino:</label>
+                <input type="number" id="searchId" required>
+            </div>
+            <div class="form-actions">
+                <button onclick="searchDinoById()">🔍 Buscar</button>
+                <button onclick="hideSearchForm()">❌ Cancelar</button>
+            </div>
+        </div>
+
+        <div id="cardsContainer" class="cards-container"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+        let isEditMode = false;
+
+        // Carregar todos os dinos
+        async function loadDinos() {
+            showLoading();
+            try {
+                const response = await fetch(`${API_URL}/dinos`);
+                if (!response.ok) throw new Error('Erro ao carregar dinos');
+                const dinos = await response.json();
+                displayDinos(dinos);
+                showMessage('Dinos carregados com sucesso!', 'success');
+            } catch (error) {
+                showMessage('Erro ao carregar dinos: ' + error.message, 'error');
+                document.getElementById('cardsContainer').innerHTML = '';
+            }
+        }
+
+        // Buscar dino por ID
+        async function searchDinoById() {
+            const id = document.getElementById('searchId').value;
+            if (!id) {
+                showMessage('Por favor, informe um ID', 'error');
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch(`${API_URL}/dinos/${id}`);
+                if (!response.ok) throw new Error('Dino não encontrado');
+                const dino = await response.json();
+                displayDinos([dino]);
+                showMessage('Dino encontrado!', 'success');
+                hideSearchForm();
+            } catch (error) {
+                showMessage('Erro: ' + error.message, 'error');
+                document.getElementById('cardsContainer').innerHTML = '';
+            }
+        }
+
+        // Exibir dinos em cards
+        function displayDinos(dinos) {
+            const container = document.getElementById('cardsContainer');
+            if (dinos.length === 0) {
+                container.innerHTML = '<p class="loading">Nenhum dino encontrado</p>';
+                return;
+            }
+
+            container.innerHTML = dinos.map(dino => `
+                <div class="card">
+                    <h3>${dino.nome}</h3>
+                    
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Velocidade</div>
+                            <div class="stat-value">${dino.velocidade}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Agilidade</div>
+                            <div class="stat-value">${dino.agilidade}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Peso</div>
+                            <div class="stat-value">${dino.peso}kg</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Mágico</div>
+                            <div class="stat-value">${dino.numero_magico}</div>
+                        </div>
+                    </div>
+
+                    <div class="hover-hint">Passe o mouse para ver mais detalhes</div>
+
+                    <div class="card-details">
+                        <div class="card-info"><strong>ID:</strong> ${dino.id_dino}</div>
+                        <div class="card-info"><strong>Altura:</strong> ${dino.altura} m</div>
+                        <div class="card-info"><strong>Comprimento:</strong> ${dino.comprimento} m</div>
+                        <div class="card-info"><strong>Longevidade:</strong> ${dino.longevidade} anos</div>
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="btn-edit" onclick="editDino(${dino.id_dino})">✏️ Editar</button>
+                        <button class="btn-delete" onclick="deleteDino(${dino.id_dino})">🗑️ Deletar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Mostrar formulário de adicionar
+        function showAddForm() {
+            isEditMode = false;
+            document.getElementById('formTitle').textContent = 'Adicionar Novo Dino';
+            document.getElementById('dinoForm').reset();
+            document.getElementById('dinoId').value = '';
+            document.getElementById('formContainer').classList.add('active');
+            document.getElementById('searchContainer').classList.remove('active');
+        }
+
+        // Mostrar formulário de busca
+        function showSearchForm() {
+            document.getElementById('searchId').value = '';
+            document.getElementById('searchContainer').classList.add('active');
+            document.getElementById('formContainer').classList.remove('active');
+        }
+
+        // Esconder formulários
+        function hideForm() {
+            document.getElementById('formContainer').classList.remove('active');
+        }
+
+        function hideSearchForm() {
+            document.getElementById('searchContainer').classList.remove('active');
+        }
+
+        // Editar dino
+        async function editDino(id) {
+            try {
+                const response = await fetch(`${API_URL}/dinos/${id}`);
+                if (!response.ok) throw new Error('Erro ao carregar dino');
+                const dino = await response.json();
+
+                isEditMode = true;
+                document.getElementById('formTitle').textContent = 'Editar Dino';
+                document.getElementById('dinoId').value = dino.id_dino;
+                document.getElementById('nome').value = dino.nome;
+                document.getElementById('altura').value = dino.altura;
+                document.getElementById('comprimento').value = dino.comprimento;
+                document.getElementById('peso').value = dino.peso;
+                document.getElementById('velocidade').value = dino.velocidade;
+                document.getElementById('agilidade').value = dino.agilidade;
+                document.getElementById('longevidade').value = dino.longevidade;
+                document.getElementById('numeroMagico').value = dino.numero_magico;
+                document.getElementById('imagem').value = dino.imagem || '';
+                
+                document.getElementById('formContainer').classList.add('active');
+                document.getElementById('searchContainer').classList.remove('active');
+            } catch (error) {
+                showMessage('Erro ao carregar dino para edição: ' + error.message, 'error');
+            }
+        }
+
+        // Deletar dino
+        async function deleteDino(id) {
+            if (!confirm('Tem certeza que deseja deletar este dino?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/dinos/${id}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) throw new Error('Erro ao deletar dino');
+                showMessage('Dino deletado com sucesso!', 'success');
+                loadDinos();
+            } catch (error) {
+                showMessage('Erro ao deletar dino: ' + error.message, 'error');
+            }
+        }
+
+        // Submeter formulário
+        document.getElementById('dinoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                NOME: document.getElementById('nome').value,
+                ALTURA: parseFloat(document.getElementById('altura').value),
+                COMPRIMENTO: parseFloat(document.getElementById('comprimento').value),
+                PESO: parseFloat(document.getElementById('peso').value),
+                VELOCIDADE: parseInt(document.getElementById('velocidade').value),
+                AGILIDADE: parseInt(document.getElementById('agilidade').value),
+                LONGEVIDADE: parseInt(document.getElementById('longevidade').value),
+                NUMERO_MAGICO: parseInt(document.getElementById('numeroMagico').value),
+                IMAGEM: document.getElementById('imagem').value || null
+            };
+
+            try {
+                let response;
+                if (isEditMode) {
+                    const id = document.getElementById('dinoId').value;
+                    response = await fetch(`${API_URL}/dinos/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    response = await fetch(`${API_URL}/dinos`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                }
+
+                if (!response.ok) throw new Error('Erro ao salvar dino');
+                
+                showMessage(`Dino ${isEditMode ? 'atualizado' : 'adicionado'} com sucesso!`, 'success');
+                hideForm();
+                loadDinos();
+            } catch (error) {
+                showMessage('Erro ao salvar dino: ' + error.message, 'error');
+            }
+        });
+
+        // Funções auxiliares
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        function showLoading() {
+            document.getElementById('cardsContainer').innerHTML = '<p class="loading">Carregando...</p>';
+        }
+
+        // Carregar dinos ao iniciar
+        window.addEventListener('load', loadDinos);
+    </script>
+</body>
+</html>
