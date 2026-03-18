@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trunfo Dino - Ícones</title>
+    <style>
+        :root {
+            --olive-bark: #585123ff;
+            --honey-bronze: #eec170ff;
+            --atomic-tangerine: #f58549ff;
+            --brandy: #772f1aff;
+            --success: #2b9348;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: radial-gradient(circle, var(--olive-bark) 0%, #1a1a1a 100%);
+            height: 100vh;
+            overflow: hidden;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container { 
+            display: flex; flex-direction: column; height: 100%;
+            max-width: 1300px; /* Aumentado um pouco para acomodar as 3 colunas */
+            margin: 0 auto; padding: 10px; width: 100%;
+        }
+
+        .hidden { display: none !important; }
+
+        /* MODAIS */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            display: flex; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .modal-content {
+            background: var(--brandy); padding: 25px; border-radius: 20px;
+            width: 400px; border: 3px solid var(--honey-bronze); text-align: center;
+        }
+
+        header { text-align: center; margin-bottom: 5px; flex-shrink: 0; }
+        
+        .game-status {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.4); padding: 8px 20px; border-radius: 30px;
+            margin-bottom: 10px; border: 1px solid var(--honey-bronze);
+            font-size: 0.9rem; flex-shrink: 0;
+        }
+
+        /* NOVO LAYOUT DA BOARD COM 3 COLUNAS */
+        .board { 
+            display: grid; 
+            grid-template-columns: 1fr 240px 1fr; /* Carta | Espaço Central | Carta */
+            gap: 20px; 
+            flex-grow: 1; 
+            min-height: 0; 
+        }
+        
+        .area-player { 
+            display: flex; flex-direction: column; height: 100%; min-width: 0;
+        }
+
+        /* COLUNA CENTRAL DE ACÇÃO */
+        .action-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top: 25px; /* Para alinhar melhor com o centro das cartas */
+        }
+
+        #roundResultAction {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            background: var(--brandy); 
+            padding: 20px; 
+            border-radius: 15px;
+            border: 3px solid var(--atomic-tangerine); 
+            width: 100%; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            text-align: center;
+            animation: zoomIn 0.3s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        #roundResultAction h2 {
+            color: white;
+            margin: 0;
+            font-size: 1.3rem;
+            line-height: 1.2;
+        }
+
+        .card {
+            background: var(--honey-bronze); border-radius: 12px; padding: 12px;
+            color: var(--brandy); flex-grow: 1; display: flex; flex-direction: column;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5); min-height: 0; position: relative;
+            overflow: hidden; /* Impede que os atributos vazem pelo fundo da carta */
+        }
+
+        .card.opponent-hidden {
+            background: repeating-linear-gradient(45deg, var(--brandy), var(--brandy) 10px, #5e2515 10px, #5e2515 20px);
+            justify-content: center; align-items: center; border: 4px solid #fff;
+        }
+        .card.opponent-hidden::after { content: "🦖"; font-size: 60px; opacity: 0.2; }
+
+        .card-icon-container {
+            width: 100%; 
+            height: 120px; 
+            flex-shrink: 0;
+            background: radial-gradient(circle, #ffe1a8 0%, var(--honey-bronze) 100%);
+            border-radius: 12px; 
+            margin-bottom: 12px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px dashed var(--brandy);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
+            overflow: hidden; /* Útil caso esteja a colocar imagens (tags img) em vez de emojis */
+        }
+
+        .card-icon {
+            font-size: 70px; 
+            filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.4));
+            transition: transform 0.3s ease;
+        }
+
+        .card-icon:hover {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .attr-list { 
+            display: flex; flex-direction: column; gap: 4px; 
+            overflow-y: auto; /* Permite scroll se os atributos forem muitos */
+            padding-right: 5px;
+            flex-grow: 1; /* Preenche o espaço restante da carta */
+        }
+        
+        .attr-item {
+            display: flex; justify-content: space-between; background: rgba(0,0,0,0.08);
+            padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .attr-item:hover:not(.disabled) { background: var(--atomic-tangerine); color: white; }
+        .attr-item.disabled { pointer-events: none; opacity: 0.9; }
+        .attr-item.winner-attr { background: var(--atomic-tangerine) !important; color: white; border: 1px solid white;}
+
+        .turn-indicator { font-size: 0.8rem; font-weight: bold; padding: 5px; text-align: center; margin-bottom: 5px; text-transform: uppercase;}
+        .active-turn { background: var(--atomic-tangerine); border-radius: 5px; }
+
+        button { background: var(--atomic-tangerine); color: white; font-weight: bold; cursor: pointer; border: none; padding: 12px 20px; border-radius: 6px; transition: 0.2s;}
+        button:hover { filter: brightness(1.2); }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: none; }
+
+        /* Ajuste para telas menores (empilha tudo caso a tela aperte) */
+        @media (max-width: 900px) {
+            .board { grid-template-columns: 1fr 1fr; }
+            .action-column { 
+                grid-column: span 2; width: 100%; padding-top: 0; 
+                order: 3; /* Vai para o fundo em telas pequenas */
+            }
+            #roundResultAction { flex-direction: row; padding: 10px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="setupModal" class="modal">
+        <div class="modal-content">
+            <h2>🦖 Trunfo Dino</h2>
+            <input type="text" id="p1Name" placeholder="Nome do Jogador 1">
+            <input type="text" id="p2Name" placeholder="Nome do Jogador 2">
+            <input type="number" id="qntCartas" placeholder="Qtd de Cartas para cada" value="5">
+            <select id="mode">
+                <option value="fame">Mais Famosos</option>
+                <option value="random">Aleatórios</option>
+            </select>
+            <button onclick="iniciarJogo()" style="width: 100%; margin-top: 10px;">INICIAR JOGO</button>
+        </div>
+    </div>
+
+    <div id="endModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="winnerTitle">VITÓRIA!</h2>
+            <p id="winnerMsg" style="margin: 15px 0;"></p>
+            <button onclick="revanche()" style="width: 100%;">REVANCHE</button>
+            <button style="background:var(--olive-bark); margin-top: 10px; width: 100%;" onclick="location.reload()">INÍCIO</button>
+        </div>
+    </div>
+
+    <div id="gameScreen" class="container hidden">
+        <header><h1>TRUNFO DINO</h1></header>
+
+        <div class="game-status">
+            <div>👤 <span id="labelP1"></span>: <b id="countP1">0</b> cartas</div>
+            <div>ROUND <b id="roundNum">1</b></div>
+            <div>👤 <span id="labelP2"></span>: <b id="countP2">0</b> cartas</div>
+        </div>
+        <div style="text-align: center; color: var(--honey-bronze); font-size: 0.8rem; height: 15px; margin-bottom: 5px;" id="infoMesa"></div>
+
+        <div class="board">
+            <div class="area-player">
+                <div id="turnP1" class="turn-indicator">Sua Vez</div>
+                <div id="cardP1" class="card"></div>
+            </div>
+
+            <div class="action-column">
+                <div id="roundResultAction" class="hidden">
+                    <h2 id="roundWinnerText">Vencedor!</h2>
+                    <button onclick="processarFimDaRodada()" style="width: 100%; margin: 0;">PRÓXIMA RODADA ➡️</button>
+                </div>
+            </div>
+
+            <div class="area-player">
+                <div id="turnP2" class="turn-indicator">Aguardando...</div>
+                <div id="cardP2" class="card"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:3000';
+        let gameState = {
+            p1: { name: '', deck: [] },
+            p2: { name: '', deck: [] },
+            turn: 1, mesa: [], round: 1, lastWinner: 0,
+            showingResult: false, selectedAttr: null,
+            config: { n: 5, mode: 'fame' },
+            nextStartingTurn: 1 
+        };
+
+        const labels = {
+            altura: 'Altura', comprimento: 'Comprimento', peso: 'Peso',
+            velocidade: 'Velocidade', agilidade: 'Agilidade', 
+            longevidade: 'Vida', numero_magico: 'Mágico'
+        };
+
+        function obterIconeDino(dino) {
+            // Nota: Se você no seu projeto atual substituiu os Emojis por tags de imagem <img>, 
+            // basta alterar o retorno desta função para incluir a sua tag <img>
+            const nomeFormatado = (dino.nome || '').toLowerCase();
+            const tipoFormatado = (dino.tipo || '').toLowerCase();
+
+            if (nomeFormatado.includes('tiranossauro') || nomeFormatado.includes('rex') || nomeFormatado.includes('alossauro')) return '🦖'; 
+            if (nomeFormatado.includes('braquiossauro') || nomeFormatado.includes('diplodoco')) return '🦕'; 
+            if (nomeFormatado.includes('pteranodonte') || tipoFormatado.includes('voador')) return '🦅'; 
+            if (nomeFormatado.includes('mosassauro') || tipoFormatado.includes('aquático')) return '🐊'; 
+            if (nomeFormatado.includes('triceratops') || nomeFormatado.includes('estegossauro')) return '🦏'; 
+            if (nomeFormatado.includes('velociraptor')) return '🦤'; 
+
+            return '🦎';
+        }
+
+        async function iniciarJogo() {
+            gameState.p1.name = document.getElementById('p1Name').value || "Jogador 1";
+            gameState.p2.name = document.getElementById('p2Name').value || "Jogador 2";
+            const n = parseInt(document.getElementById('qntCartas').value) || 5;
+            const mode = document.getElementById('mode').value;
+            gameState.config = { n, mode };
+
+            gameState.turn = Math.random() < 0.5 ? 1 : 2;
+
+            await carregarCartas(n, mode);
+            document.getElementById('setupModal').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            render();
+        }
+
+        async function carregarCartas(n, mode) {
+            const res = await fetch(`${API}/dinos/${mode === 'fame' ? 'top/fama' : 'random'}/${n*2}`);
+            const data = await res.json();
+            data.sort(() => Math.random() - 0.5);
+            gameState.p1.deck = data.slice(0, n);
+            gameState.p2.deck = data.slice(n, n*2);
+            gameState.mesa = []; 
+            gameState.round = 1; 
+            gameState.showingResult = false;
+        }
+
+        function render() {
+            if (gameState.p1.deck.length === 0 || gameState.p2.deck.length === 0) {
+                let vencedorNome, perdedorTurno;
+
+                if (gameState.p1.deck.length > 0) {
+                    vencedorNome = gameState.p1.name;
+                    perdedorTurno = 2;
+                } else {
+                    vencedorNome = gameState.p2.name;
+                    perdedorTurno = 1;
+                }
+
+                gameState.nextStartingTurn = perdedorTurno;
+
+                document.getElementById('winnerMsg').innerText = `🎉 ${vencedorNome} dominou o parque jurássico!`;
+                document.getElementById('endModal').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('countP1').innerText = gameState.p1.deck.length;
+            document.getElementById('countP2').innerText = gameState.p2.deck.length;
+            document.getElementById('roundNum').innerText = gameState.round;
+            document.getElementById('labelP1').innerText = gameState.p1.name;
+            document.getElementById('labelP2').innerText = gameState.p2.name;
+            document.getElementById('infoMesa').innerText = gameState.mesa.length > 0 ? `🔥 Cartas em disputa: ${gameState.mesa.length}` : "";
+
+            const turnTextP1 = gameState.turn === 1 ? 'Sua Vez' : 'Aguardando...';
+            const turnTextP2 = gameState.turn === 2 ? 'Sua Vez' : 'Aguardando...';
+            
+            document.getElementById('turnP1').innerText = turnTextP1;
+            document.getElementById('turnP2').innerText = turnTextP2;
+            
+            document.getElementById('turnP1').className = gameState.turn === 1 ? 'turn-indicator active-turn' : 'turn-indicator';
+            document.getElementById('turnP2').className = gameState.turn === 2 ? 'turn-indicator active-turn' : 'turn-indicator';
+
+            renderCard('cardP1', gameState.p1.deck[0], gameState.turn === 1 || gameState.showingResult);
+            renderCard('cardP2', gameState.p2.deck[0], gameState.turn === 2 || gameState.showingResult);
+        }
+
+        function renderCard(containerId, dino, showContent) {
+            const container = document.getElementById(containerId);
+            
+            if (!showContent) {
+                container.className = 'card opponent-hidden'; 
+                container.innerHTML = ''; 
+                return;
+            }
+            
+            container.className = 'card';
+            const iconeDino = obterIconeDino(dino);
+
+            container.innerHTML = `
+                <div class="card-icon-container">
+                    <span class="card-icon">${iconeDino}</span>
+                </div>
+                <div style="margin-bottom:5px; flex-shrink: 0;">
+                    <h2 style="font-size: 1.1rem; margin-bottom: 2px;">${dino.nome}</h2>
+                    <small style="opacity: 0.8; font-weight: bold; text-transform: uppercase;">${dino.tipo}</small>
+                </div>
+                <div class="attr-list">
+                    ${Object.keys(labels).map(key => {
+                        const isSelected = gameState.showingResult && key === gameState.selectedAttr;
+                        const itemClass = `attr-item ${gameState.showingResult ? 'disabled' : ''} ${isSelected ? 'winner-attr' : ''}`;
+                        return `
+                        <div class="${itemClass}" onclick="desafiar('${key}')">
+                            <span>${labels[key]}</span>
+                            <span>${dino[key] || 0}</span>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>`;
+        }
+
+        function desafiar(attr) {
+            gameState.showingResult = true;
+            gameState.selectedAttr = attr;
+
+            const c1 = gameState.p1.deck[0]; 
+            const c2 = gameState.p2.deck[0];
+            const v1 = parseFloat(c1[attr]) || 0; 
+            const v2 = parseFloat(c2[attr]) || 0;
+            
+            gameState.lastWinner = v1 > v2 ? 1 : (v2 > v1 ? 2 : 0);
+            
+            const txt = document.getElementById('roundWinnerText');
+            if(gameState.lastWinner === 0) {
+                txt.innerText = "EMPATE!";
+            } else {
+                txt.innerText = `🏆 ${gameState.lastWinner === 1 ? gameState.p1.name : gameState.p2.name} venceu!`;
+            }
+
+            document.getElementById('roundResultAction').classList.remove('hidden');
+            render(); 
+        }
+
+        function processarFimDaRodada() {
+            document.getElementById('roundResultAction').classList.add('hidden');
+            gameState.showingResult = false;
+            gameState.selectedAttr = null;
+
+            const cp1 = gameState.p1.deck.shift();
+            const cp2 = gameState.p2.deck.shift();
+            gameState.mesa.push(cp1, cp2);
+
+            if (gameState.lastWinner !== 0) {
+                const ganhador = gameState.lastWinner === 1 ? gameState.p1 : gameState.p2;
+                ganhador.deck.push(...gameState.mesa);
+                gameState.mesa = []; 
+                gameState.turn = gameState.lastWinner; 
+            }
+            
+            gameState.round++;
+            render(); 
+        }
+
+        async function revanche() {
+            document.getElementById('endModal').classList.add('hidden');
+            gameState.turn = gameState.nextStartingTurn;
+            await carregarCartas(gameState.config.n, gameState.config.mode);
+            render();
+        }
+    </script>
+</body>
+</html>

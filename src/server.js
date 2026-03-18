@@ -21,7 +21,7 @@ app.use(express.json());
 // Rota para buscar todos os dinos
 app.get("/dinos", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM DINO");
+    const result = await pool.query("SELECT * FROM dino ORDER BY id");
     res.json(result.rows);
   } catch (err) {
     console.error(err.message);
@@ -29,13 +29,54 @@ app.get("/dinos", async (req, res) => {
   }
 });
 
+// Rota para buscar N dinos aleatórios
+app.get("/dinos/random/:n", async (req, res) => {
+  const n = Number.parseInt(req.params.n, 10);
+
+  if (!Number.isInteger(n) || n <= 0) {
+    return res
+      .status(400)
+      .json({ error: "Parâmetro n deve ser um número inteiro maior que 0" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM dino ORDER BY RANDOM() LIMIT $1",
+      [n],
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Erro ao buscar dinos aleatórios" });
+  }
+});
+
+app.get("/dinos/top/fama/:n", async (req, res) => {
+  const n = Number.parseInt(req.params.n, 10);
+
+  if (!Number.isInteger(n) || n <= 0) {
+    return res
+      .status(400)
+      .json({ error: "Parâmetro n deve ser um número inteiro maior que 0" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM dino ORDER BY fama DESC NULLS LAST, id ASC LIMIT $1",
+      [n],
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Erro ao buscar dinos mais famosos" });
+  }
+});
+
 // Rota para buscar um dino por ID
 app.get("/dinos/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await pool.query("SELECT * FROM DINO WHERE ID_DINO = $1", [
-      id,
-    ]);
+    const result = await pool.query("SELECT * FROM dino WHERE id = $1", [id]);
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Dino não encontrado" });
     }
@@ -48,11 +89,40 @@ app.get("/dinos/:id", async (req, res) => {
 
 // Rota para adicionar um dino
 app.post("/dinos", async (req, res) => {
-  const { NOME, ALTURA, COMPRIMENTO, PESO, VELOCIDADE, AGILIDADE, LONGEVIDADE, NUMERO_MAGICO, IMAGEM } = req.body;
+  const {
+    nome,
+    altura,
+    comprimento,
+    peso,
+    velocidade,
+    agilidade,
+    longevidade,
+    numero_magico,
+    imagem,
+    fama,
+    tipo,
+  } = req.body;
+
+  if (!nome || !tipo) {
+    return res.status(400).json({ error: "Campos obrigatórios: nome e tipo" });
+  }
+
   try {
     const result = await pool.query(
-      "INSERT INTO DINO (NOME, ALTURA, COMPRIMENTO, PESO, VELOCIDADE, AGILIDADE, LONGEVIDADE, NUMERO_MAGICO, IMAGEM) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
-      [NOME, ALTURA, COMPRIMENTO, PESO, VELOCIDADE, AGILIDADE, LONGEVIDADE, NUMERO_MAGICO, IMAGEM],
+      "INSERT INTO dino (nome, altura, comprimento, peso, velocidade, agilidade, longevidade, numero_magico, imagem, fama, tipo) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
+      [
+        nome,
+        altura,
+        comprimento,
+        peso,
+        velocidade,
+        agilidade,
+        longevidade,
+        numero_magico,
+        imagem,
+        fama,
+        tipo,
+      ],
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -64,11 +134,41 @@ app.post("/dinos", async (req, res) => {
 // Rota para atualizar um dino
 app.put("/dinos/:id", async (req, res) => {
   const { id } = req.params;
-  const { NOME, ALTURA, COMPRIMENTO, PESO, VELOCIDADE, AGILIDADE, LONGEVIDADE, NUMERO_MAGICO, IMAGEM } = req.body;
+  const {
+    nome,
+    altura,
+    comprimento,
+    peso,
+    velocidade,
+    agilidade,
+    longevidade,
+    numero_magico,
+    imagem,
+    fama,
+    tipo,
+  } = req.body;
+
+  if (!nome || !tipo) {
+    return res.status(400).json({ error: "Campos obrigatórios: nome e tipo" });
+  }
+
   try {
     const result = await pool.query(
-      "UPDATE dino SET nome = $1, altura = $2, comprimento = $3, peso = $4, velocidade = $5, agilidade = $6, longevidade = $7, numero_magico = $8, imagem = $9  WHERE id_dino = $10 RETURNING *",
-      [NOME, ALTURA, COMPRIMENTO, PESO, VELOCIDADE, AGILIDADE, LONGEVIDADE, NUMERO_MAGICO, IMAGEM, id],
+      "UPDATE dino SET nome = $1, altura = $2, comprimento = $3, peso = $4, velocidade = $5, agilidade = $6, longevidade = $7, numero_magico = $8, imagem = $9, fama = $10, tipo = $11 WHERE id = $12 RETURNING *",
+      [
+        nome,
+        altura,
+        comprimento,
+        peso,
+        velocidade,
+        agilidade,
+        longevidade,
+        numero_magico,
+        imagem,
+        fama,
+        tipo,
+        id,
+      ],
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "dino não encontrado" });
@@ -85,7 +185,7 @@ app.delete("/dinos/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const result = await pool.query(
-      "DELETE FROM dino WHERE id_dino = $1 RETURNING *",
+      "DELETE FROM dino WHERE id = $1 RETURNING *",
       [id],
     );
     if (result.rows.length === 0) {

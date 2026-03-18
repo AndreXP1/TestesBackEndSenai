@@ -433,6 +433,16 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="fama">Fama:</label>
+                    <input type="number" id="fama">
+                </div>
+
+                <div class="form-group">
+                    <label for="tipo">Tipo:</label>
+                    <input type="text" id="tipo" required>
+                </div>
+
+                <div class="form-group">
                     <label for="imagem">Imagem URL:</label>
                     <input type="text" id="imagem" placeholder="URL da imagem">
                 </div>
@@ -535,15 +545,17 @@
                     <div class="hover-hint">Passe o mouse para ver mais detalhes</div>
 
                     <div class="card-details">
-                        <div class="card-info"><strong>ID:</strong> ${dino.id_dino}</div>
+                        <div class="card-info"><strong>ID:</strong> ${dino.id}</div>
                         <div class="card-info"><strong>Altura:</strong> ${dino.altura} m</div>
                         <div class="card-info"><strong>Comprimento:</strong> ${dino.comprimento} m</div>
                         <div class="card-info"><strong>Longevidade:</strong> ${dino.longevidade} anos</div>
+                        <div class="card-info"><strong>Fama:</strong> ${dino.fama ?? '-'}</div>
+                        <div class="card-info"><strong>Tipo:</strong> ${dino.tipo}</div>
                     </div>
 
                     <div class="card-actions">
-                        <button class="btn-edit" onclick="editDino(${dino.id_dino})">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteDino(${dino.id_dino})">🗑️ Deletar</button>
+                        <button class="btn-edit" onclick="editDino(${dino.id})">✏️ Editar</button>
+                        <button class="btn-delete" onclick="deleteDino(${dino.id})">🗑️ Deletar</button>
                     </div>
                 </div>
             `).join('');
@@ -584,7 +596,7 @@
 
                 isEditMode = true;
                 document.getElementById('formTitle').textContent = 'Editar Dino';
-                document.getElementById('dinoId').value = dino.id_dino;
+                document.getElementById('dinoId').value = dino.id;
                 document.getElementById('nome').value = dino.nome;
                 document.getElementById('altura').value = dino.altura;
                 document.getElementById('comprimento').value = dino.comprimento;
@@ -593,6 +605,8 @@
                 document.getElementById('agilidade').value = dino.agilidade;
                 document.getElementById('longevidade').value = dino.longevidade;
                 document.getElementById('numeroMagico').value = dino.numero_magico;
+                document.getElementById('fama').value = dino.fama ?? '';
+                document.getElementById('tipo').value = dino.tipo;
                 document.getElementById('imagem').value = dino.imagem || '';
                 
                 document.getElementById('formContainer').classList.add('active');
@@ -623,15 +637,17 @@
             e.preventDefault();
 
             const data = {
-                NOME: document.getElementById('nome').value,
-                ALTURA: parseFloat(document.getElementById('altura').value),
-                COMPRIMENTO: parseFloat(document.getElementById('comprimento').value),
-                PESO: parseFloat(document.getElementById('peso').value),
-                VELOCIDADE: parseInt(document.getElementById('velocidade').value),
-                AGILIDADE: parseInt(document.getElementById('agilidade').value),
-                LONGEVIDADE: parseInt(document.getElementById('longevidade').value),
-                NUMERO_MAGICO: parseInt(document.getElementById('numeroMagico').value),
-                IMAGEM: document.getElementById('imagem').value || null
+                nome: document.getElementById('nome').value,
+                altura: parseFloat(document.getElementById('altura').value),
+                comprimento: parseFloat(document.getElementById('comprimento').value),
+                peso: parseFloat(document.getElementById('peso').value),
+                velocidade: parseFloat(document.getElementById('velocidade').value),
+                agilidade: parseInt(document.getElementById('agilidade').value),
+                longevidade: parseInt(document.getElementById('longevidade').value),
+                numero_magico: parseInt(document.getElementById('numeroMagico').value),
+                fama: document.getElementById('fama').value ? parseInt(document.getElementById('fama').value) : null,
+                tipo: document.getElementById('tipo').value,
+                imagem: document.getElementById('imagem').value || null
             };
 
             try {
