@@ -122,13 +122,12 @@ Um teste será considerado **aprovado** quando:
 
 ## 6. Checklist formal de testes
 
-| ID | Requisito / Objetivo | Rota | Pré-condição | Entrada / Dados de teste | Passos de execução | Resultado esperado | Status 
-(✅/❌/⚠️) |
+| ID | Requisito / Objetivo | Rota | Pré-condição | Entrada / Dados de teste | Passos de execução | Resultado esperado | Status (✅/❌/⚠️) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | CT01 | Validar listagem geral de dinos | `GET /dinos` | Tabela `dino` com registros | Nenhuma | Enviar requisição GET para `/dinos` | Retornar status `200` | ✅ |
 | CT02 | Validar formato da listagem | `GET /dinos` | Tabela com registros | Nenhuma | Executar `GET /dinos` | Resposta deve ser um array JSON | ✅ |
 | CT03 | Validar conteúdo da listagem | `GET /dinos` | Tabela com registros conhecidos | Nenhuma | Executar `GET /dinos` | Array deve conter registros existentes no banco | ✅ |
-| CT04 | Validar busca por id existente | `GET /dinos/:id` | Existe um id válido | `id` existente | Enviar `GET /dinos/{id}` | Retornar status `200`  | ✅ |
+| CT04 | Validar busca por id existente | `GET /dinos/:id` | Existe um id válido | `id` existente | Enviar `GET /dinos/{id}` | Retornar status `200` | ✅ |
 | CT05 | Validar formato da busca por id | `GET /dinos/:id` | Existe um id válido | `id` existente | Executar `GET /dinos/{id}` | Resposta deve ser um objeto JSON | ✅ |
 | CT06 | Validar conteúdo da busca por id | `GET /dinos/:id` | Existe um id válido e conhecido | `id` existente | Executar `GET /dinos/{id}` | Objeto retornado deve corresponder ao registro do banco | ✅ |
 | CT07 | Validar busca por id inexistente | `GET /dinos/:id` | API em funcionamento | `id = 999999` ou equivalente inexistente | Executar `GET /dinos/999999` | Retornar status `404` e mensagem de erro | ✅ |
@@ -165,7 +164,6 @@ Um teste será considerado **aprovado** quando:
 | CT38 | Validar tratamento de falha no banco em atualização | `PUT /dinos/:id` | Banco indisponível | `id` válido + body válido | Executar `PUT /dinos/{id}` | Retornar status `500` | ✅ |
 | CT39 | Validar tratamento de falha no banco em exclusão | `DELETE /dinos/:id` | Banco indisponível | `id` válido | Executar `DELETE /dinos/{id}` | Retornar status `500` | ✅ |
 | CT40 | Validar robustez da API após erro | Qualquer rota | Gerar erro proposital em uma requisição anterior | Requisição válida após erro | Executar uma requisição válida depois de uma inválida | API deve continuar operacional | ✅ |
-
 ---
 
 ---
