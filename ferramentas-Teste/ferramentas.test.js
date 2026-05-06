@@ -11,82 +11,122 @@ import {
     converteHorasEmMs, converteMsEmHoras
 } from "./ferramentas";
 
-test("Converte 250 metros para pés", () => {
-    expect(converteMetroEmPes(250)).toBeCloseTo(820.25);
+test("converteMetroEmPes", () => {
+    expect(converteMetroEmPes(1)).toBeCloseTo(3.281);
+    expect(converteMetroEmPes(10)).toBeCloseTo(32.81);
+    expect(converteMetroEmPes(100)).toBeCloseTo(328.1);
 });
 
-test("Converte 50 pés para metros", () => {
-    expect(convertePesEmMetro(50)).toBeCloseTo(15.239);
+test("convertePesEmMetro", () => {
+    expect(convertePesEmMetro(3.281)).toBe(1);
+    expect(convertePesEmMetro(32.81)).toBe(10);
+    expect(convertePesEmMetro(328.1)).toBe(100);
 });
 
-test("Converte 150 quilômetros para milhas", () => {
-    expect(converteKmEmMilha(150)).toBeCloseTo(93.205);
+test("converteKmEmMilha", () => {
+    expect(converteKmEmMilha(1.60934)).toBe(1);
+    expect(converteKmEmMilha(16.0934)).toBe(10);
+    expect(converteKmEmMilha(80.467)).toBeCloseTo(50);
 });
 
-test("Converte 100 milhas para quilômetros", () => {
-    expect(converteMilhaEmKm(100)).toBeCloseTo(160.934);
+test("converteMilhaEmKm", () => {
+    expect(converteMilhaEmKm(1)).toBe(1.60934);
+    expect(converteMilhaEmKm(10)).toBe(16.0934);
+    expect(converteMilhaEmKm(50)).toBe(80.467);
 });
 
-test("Converte 100 centímetros para polegadas", () => {
-    expect(converteCmEmPolegada(100)).toBeCloseTo(39.37);
+test("converteCmEmPolegada", () => {
+    expect(converteCmEmPolegada(2.54)).toBe(1);
+    expect(converteCmEmPolegada(25.4)).toBe(10);
+    expect(converteCmEmPolegada(127)).toBe(50);
 });
 
-test("Converte 40 polegadas para centímetros", () => {
-    expect(convertePolegadaEmCm(40)).toBe(101.6);
+test("convertePolegadaEmCm", () => {
+    expect(convertePolegadaEmCm(1)).toBe(2.54);
+    expect(convertePolegadaEmCm(10)).toBe(25.4);
+    expect(convertePolegadaEmCm(0.5)).toBe(1.27);
 });
 
-test("Converte 85 quilogramas para libras", () => {
-    expect(converteKgEmLibra(85)).toBeCloseTo(187.39);
+test("converteKgEmLibra", () => {
+    expect(converteKgEmLibra(1)).toBe(2.20462);
+    expect(converteKgEmLibra(50)).toBeCloseTo(110.231);
+    expect(converteKgEmLibra(100)).toBe(220.462);
 });
 
-test("Converte 150 libras para quilogramas", () => {
-    expect(converteLibraEmKg(150)).toBeCloseTo(68.038);
+test("converteLibraEmKg", () => {
+    expect(converteLibraEmKg(2.20462)).toBe(1);
+    expect(converteLibraEmKg(110.231)).toBeCloseTo(50);
+    expect(converteLibraEmKg(220.462)).toBe(100);
 });
 
-test("Converte 32 Fahrenheit para Celsius", () => {
+test("converteFahrenheitEmCelsius", () => {
     expect(converteFahrenheitEmCelsius(32)).toBe(0);
+    expect(converteFahrenheitEmCelsius(212)).toBe(100);
+    expect(converteFahrenheitEmCelsius(50)).toBe(10);
 });
 
-test("Converte 100 Celsius para Fahrenheit", () => {
+test("converteCelsiusEmFahrenheit", () => {
+    expect(converteCelsiusEmFahrenheit(0)).toBe(32);
     expect(converteCelsiusEmFahrenheit(100)).toBe(212);
+    expect(converteCelsiusEmFahrenheit(10)).toBe(50);
 });
 
-test("Converte 310 Kelvin para Celsius", () => {
-    expect(converteKelvinEmCelsius(310)).toBeCloseTo(36.85);
+test("converteKelvinEmCelsius", () => {
+    expect(converteKelvinEmCelsius(273.15)).toBe(0);
+    expect(converteKelvinEmCelsius(0)).toBe(-273.15);
+    expect(converteKelvinEmCelsius(373.15)).toBe(100);
 });
 
-test("Converte -10 Celsius para Kelvin", () => {
-    expect(converteCelsiusEmKelvin(-10)).toBe(263.15);
+test("converteCelsiusEmKelvin", () => {
+    expect(converteCelsiusEmKelvin(0)).toBe(273.15);
+    expect(converteCelsiusEmKelvin(-273.15)).toBe(0);
+    expect(converteCelsiusEmKelvin(100)).toBe(373.15);
 });
 
-test("Converte 750 Reais para Dólares", () => {
-    expect(converteRealEmDolar(750)).toBe(150);
+test("converteRealEmDolar", () => {
+    expect(converteRealEmDolar(5)).toBe(1);
+    expect(converteRealEmDolar(25)).toBe(5);
+    expect(converteRealEmDolar(500)).toBe(100);
 });
 
-test("Converte 40 Dólares para Reais", () => {
-    expect(converteDolarEmReal(40)).toBe(200);
+test("converteDolarEmReal", () => {
+    expect(converteDolarEmReal(1)).toBe(5);
+    expect(converteDolarEmReal(5)).toBe(25);
+    expect(converteDolarEmReal(100)).toBe(500);
 });
 
-test("Converte 220 Reais para Euros", () => {
-    expect(converteRealEmEuro(220)).toBe(40);
+test("converteRealEmEuro", () => {
+    expect(converteRealEmEuro(5.50)).toBe(1);
+    expect(converteRealEmEuro(55)).toBe(10);
+    expect(converteRealEmEuro(110)).toBe(20);
 });
 
-test("Converte 100 Euros para Reais", () => {
-    expect(converteEuroEmReal(100)).toBe(550);
+test("converteEuroEmReal", () => {
+    expect(converteEuroEmReal(1)).toBe(5.50);
+    expect(converteEuroEmReal(10)).toBe(55);
+    expect(converteEuroEmReal(20)).toBe(110);
 });
 
-test("Converte 2 Reais para Won", () => {
-    expect(converteRealEmWon(2)).toBe(540);
+test("converteRealEmWon", () => {
+    expect(converteRealEmWon(1)).toBe(270);
+    expect(converteRealEmWon(10)).toBe(2700);
+    expect(converteRealEmWon(0.5)).toBe(135);
 });
 
-test("Converte 5400 Won para Reais", () => {
-    expect(converteWonEmReal(5400)).toBe(20);
+test("converteWonEmReal", () => {
+    expect(converteWonEmReal(270)).toBe(1);
+    expect(converteWonEmReal(2700)).toBe(10);
+    expect(converteWonEmReal(135)).toBe(0.5);
 });
 
-test("Converte 10 horas para milissegundos", () => {
-    expect(converteHorasEmMs(10)).toBe(36000000);
+test("converteHorasEmMs", () => {
+    expect(converteHorasEmMs(1)).toBe(3600000);
+    expect(converteHorasEmMs(0.5)).toBe(1800000);
+    expect(converteHorasEmMs(24)).toBe(86400000);
 });
 
-test("Converte 1800000 ms para horas", () => {
+test("converteMsEmHoras", () => {
+    expect(converteMsEmHoras(3600000)).toBe(1);
     expect(converteMsEmHoras(1800000)).toBe(0.5);
+    expect(converteMsEmHoras(86400000)).toBe(24);
 });
